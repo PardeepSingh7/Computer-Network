@@ -1,0 +1,18 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+url = "https://forecast.weather.gov/MapClick.php?lat=34.0522°&lon=-118.2437°#.XtpdeOfhXIX"
+r = requests.get(url)
+soup = BeautifulSoup(r.content, "html.parser")
+week = soup.find(id="detailed-forecast-body")
+items = soup.find_all("div", class_="row row-even row-forecast")
+
+period_name = [item.find(class_="col-sm-2 forecast-label").get_text()
+               for item in items]
+short_desc = [item.find(class_="col-sm-10 forecast-text").get_text()
+              for item in items]
+#temp = [item.find(class_="temp").get_text() for item in items]
+df = pd.DataFrame(
+    {"Period": period_name, "Short Description": short_desc})
+
+df.to_csv("Weather_Data.csv")
